@@ -16,25 +16,27 @@ pipeline {
 
         stage('Trivy Vulnerability Scan') {
             steps {
-                echo "Running Trivy Scan..."
+                script {
+                    echo "Running Trivy Scan..."
 
-                sh """
-                trivy image --severity CRITICAL,HIGH \
-                --exit-code 0 \
-                --no-progress \
-                --format table \
-                ${IMAGE_NAME}:${IMAGE_TAG} > trivy-report.txt
-                """
+                    sh """
+                    trivy image --severity CRITICAL,HIGH \
+                    --exit-code 0 \
+                    --no-progress \
+                    --format table \
+                    ${IMAGE_NAME}:${IMAGE_TAG} > trivy-report.txt
+                    """
 
-                def vulnCount = sh(
-                    script: "trivy image --severity CRITICAL,HIGH --exit-code 0 --no-progress ${IMAGE_NAME}:${IMAGE_TAG} | grep -E 'CRITICAL|HIGH' | wc -l",
-                    returnStdout: true
-                ).trim().toInteger()
+                    def vulnCount = sh(
+                        script: "trivy image --severity CRITICAL,HIGH --exit-code 0 --no-progress ${IMAGE_NAME}:${IMAGE_TAG} | grep -E 'CRITICAL|HIGH' | wc -l",
+                        returnStdout: true
+                    ).trim().toInteger()
 
-                echo "Total High + Critical Vulnerabilities: ${vulnCount}"
+                    echo "Total High + Critical Vulnerabilities: ${vulnCount}"
 
-                if (vulnCount > 5) {
-                    error "Build failed: Too many High/Critical vulnerabilities (${vulnCount})"
+                    if (vulnCount > 5) {
+                        error "Build failed: Too many High/Critical vulnerabilities (${vulnCount})"
+                    }
                 }
             }
         }
@@ -51,10 +53,10 @@ pipeline {
             archiveArtifacts artifacts: 'trivy-report.txt'
         }
         success {
-            echo "Pipeline Passed "
+            echo "Pipeline Passed"
         }
         failure {
-            echo "Pipeline Failed due to vulnerabilities "
+            echo "Pipeline Failed due to vulnerabilities"
         }
     }
 }
