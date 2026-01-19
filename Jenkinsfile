@@ -20,7 +20,7 @@ pipeline {
                     echo "Running Trivy Scan..."
 
                     sh """
-                    trivy image --severity CRITICAL,HIGH \
+                    /usr/local/bin/trivy image --severity CRITICAL,HIGH \
                     --exit-code 0 \
                     --no-progress \
                     --format table \
@@ -28,7 +28,7 @@ pipeline {
                     """
 
                     def vulnCount = sh(
-                        script: "trivy image --severity CRITICAL,HIGH --exit-code 0 --no-progress ${IMAGE_NAME}:${IMAGE_TAG} | grep -E 'CRITICAL|HIGH' | wc -l",
+                        script: "/usr/local/bin/trivy image --severity CRITICAL,HIGH --exit-code 0 --no-progress ${IMAGE_NAME}:${IMAGE_TAG} | grep -E 'CRITICAL|HIGH' | wc -l",
                         returnStdout: true
                     ).trim().toInteger()
 
