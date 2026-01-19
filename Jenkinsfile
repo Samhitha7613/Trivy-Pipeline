@@ -11,7 +11,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/your-repo/sample-app.git', branch: 'main'
+                git url: 'https://github.com/Samhitha7613/Trivy-Pipeline.git', branch: 'main'
             }
         }
 
